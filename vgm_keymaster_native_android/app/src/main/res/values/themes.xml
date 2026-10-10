@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.VGMKeyMaster.Fullscreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">#12090D</item>
+    </style>
+</resources>

@@ -29,14 +29,30 @@ jobs:
           echo "Found project at: $PROJECT_DIR"
           cd "$PROJECT_DIR"
 
-          # 2. Write clean gradle.properties (removes jetifier)
+          # 2. Write clean gradle.properties
           cat << 'EOF' > gradle.properties
           org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
           android.useAndroidX=true
           kotlin.code.style=official
           EOF
 
-          # 3. Write clean app build config (removes databinding/viewbinding/ndk)
+          # 3. Add the missing Theme.VGMKeyMaster to themes.xml
+          mkdir -p app/src/main/res/values
+          cat << 'EOF' > app/src/main/res/values/themes.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="Theme.VGMKeyMaster" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+                  <item name="android:windowNoTitle">true</item>
+                  <item name="android:windowActionBar">false</item>
+                  <item name="android:windowFullscreen">true</item>
+                  <item name="android:windowContentOverlay">@null</item>
+                  <item name="android:windowBackground">#12090D</item>
+              </style>
+              <style name="Theme.VGMKeyMaster.Fullscreen" parent="Theme.VGMKeyMaster" />
+          </resources>
+          EOF
+
+          # 4. Write clean app/build.gradle.kts
           cat << 'EOF' > app/build.gradle.kts
           plugins {
               id("com.android.application")
@@ -78,7 +94,7 @@ jobs:
           }
           EOF
 
-          # 4. Compile the APK
+          # 5. Compile the APK
           gradle assembleDebug --no-daemon
 
       - name: Upload APK Artifact
@@ -86,4 +102,3 @@ jobs:
         with:
           name: VGM-KeyMaster-Native-APK
           path: "**/app/build/outputs/apk/debug/*.apk"
-          

@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.VGMKeyMaster" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">#050814</item>
+    </style>
+</resources>

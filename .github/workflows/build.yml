@@ -33,10 +33,10 @@ jobs:
           echo "Building inside: $PROJECT_DIR"
           cd "$PROJECT_DIR"
 
-          # 2. Delete conflicting old Groovy files that had the typo
+          # 2. Delete conflicting old Groovy files
           rm -f build.gradle settings.gradle
 
-          # 3. Write clean root build.gradle.kts with proper Kotlin version
+          # 3. Write clean root build.gradle.kts
           cat << 'EOF' > build.gradle.kts
           plugins {
               id("com.android.application") version "8.2.2" apply false
@@ -71,7 +71,25 @@ jobs:
           kotlin.code.style=official
           EOF
 
-          # 6. Embed the exact HTML file into Android assets
+          # 6. Remove duplicate style file to prevent duplicate resource error
+          rm -f app/src/main/res/values/styles.xml
+
+          # 7. Write single clean themes.xml
+          mkdir -p app/src/main/res/values
+          cat << 'EOF' > app/src/main/res/values/themes.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="Theme.VGMKeyMaster" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+                  <item name="android:windowNoTitle">true</item>
+                  <item name="android:windowActionBar">false</item>
+                  <item name="android:windowFullscreen">true</item>
+                  <item name="android:windowContentOverlay">@null</item>
+                  <item name="android:windowBackground">#12090D</item>
+              </style>
+          </resources>
+          EOF
+
+          # 8. Embed the exact HTML file into Android assets
           mkdir -p app/src/main/assets
           HTML_SRC=$(find . -name "*vintage*.html" -o -name "vgm_keymaster*.html" | head -n 1)
           if [ -n "$HTML_SRC" ]; then
@@ -79,7 +97,7 @@ jobs:
             cp "$HTML_SRC" app/src/main/assets/index.html
           fi
 
-          # 7. Write MainActivity.kt to load the HTML app in fullscreen
+          # 9. Write MainActivity.kt to load the HTML app in fullscreen
           mkdir -p app/src/main/java/com/vgmkeymaster/nativeapp
           cat << 'EOF' > app/src/main/java/com/vgmkeymaster/nativeapp/MainActivity.kt
           package com.vgmkeymaster.nativeapp
@@ -149,22 +167,7 @@ jobs:
           }
           EOF
 
-          # 8. Write themes.xml
-          mkdir -p app/src/main/res/values
-          cat << 'EOF' > app/src/main/res/values/themes.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <style name="Theme.VGMKeyMaster" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-                  <item name="android:windowNoTitle">true</item>
-                  <item name="android:windowActionBar">false</item>
-                  <item name="android:windowFullscreen">true</item>
-                  <item name="android:windowContentOverlay">@null</item>
-                  <item name="android:windowBackground">#12090D</item>
-              </style>
-          </resources>
-          EOF
-
-          # 9. Write clean app/build.gradle.kts
+          # 10. Write clean app/build.gradle.kts
           cat << 'EOF' > app/build.gradle.kts
           plugins {
               id("com.android.application")
@@ -206,7 +209,7 @@ jobs:
           }
           EOF
 
-          # 10. Build the APK
+          # 11. Build the APK
           gradle assembleDebug --no-daemon
 
       - name: Upload APK Artifact
